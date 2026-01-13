@@ -1,0 +1,91 @@
+# Client Onboarding Automation – System Design Notes
+
+## Goal
+Build a backend-controlled, secure client onboarding automation using n8n.
+
+## Target Interview Summary
+"I rebuilt a client onboarding automation system from scratch, focusing on API security, workflow orchestration, failure handling, and auditability."
+
+## Who is the client?
+A SaaS company onboarding new customers after signup or approval.
+
+## What triggers onboarding?
+A secure backend API endpoint that triggers an n8n webhook.
+
+## Core onboarding steps
+1. Receive client data
+2. Authenticate request
+3. Validate payload
+4. Store client in database
+5. Execute onboarding steps
+6. Notify stakeholders
+7. Log every step
+
+## Non-goals (intentionally excluded)
+- No frontend UI
+- No AI features
+- No complex user roles
+
+
+## System boundaries
+- Backend API owns authentication and validation
+- n8n owns workflow orchestration
+- Database owns state and audit logs
+- External services are replaceable via webhooks
+
+
+
+## High-level architecture
+
+Client/Admin
+   |
+   | POST /onboard-client (API Key)
+   v
+Backend API (Node.js)
+   |
+   | Authenticated webhook call
+   v
+n8n Workflow Engine
+   |
+   | DB writes + notifications
+   v
+PostgreSQL
+
+
+## Data model (initial)
+
+clients
+- id (UUID)
+- name
+- email
+- company
+- status (pending, active, failed)
+- created_at
+
+onboarding_logs
+- id (UUID)
+- client_id (FK)
+- step_name
+- status (success, failed)
+- error_message
+- created_at
+
+
+## Failure handling philosophy
+- Fail fast on invalid input
+- Log every failure with context
+- Do not silently retry forever
+- Make workflows observable and debuggable
+
+## Step 3 – Core Onboarding Workflow (Completed)
+
+- Implemented webhook-driven onboarding flow in n8n
+- Added payload validation with fail-fast behavior
+- Connected n8n to PostgreSQL via Docker Compose networking
+- Created `clients` table with UNIQUE email constraint
+- Inserted validated client data into Postgres
+- Verified duplicate client rejection at DB level
+- Confirmed end-to-end flow via curl and n8n executions
+
+
+

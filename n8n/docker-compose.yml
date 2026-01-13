@@ -33,3 +33,5 @@ services:
 volumes:
   postgres_data:
   n8n_data:
+environment:
+  - N8N_API_KEY=super_secret_key_123
